@@ -1,0 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+cc_test(
+    name = "dummy_test",
+    timeout = "short",
+    srcs = ["dummy_test.cpp"],
+    deps = [
+        "@boost_ut",
+    ],
+)
