@@ -110,6 +110,20 @@ register_toolchains(
     "@gcc_12_toolchain//:toolchain",
 )
 
+FMT_VERSION = "dd5a9691f992f7f257243cbecb516a4ab584dcde"
+
+http_archive(
+    name = "fmt",
+    patch_cmds = [
+        "mv support/bazel/.bazelversion .bazelversion",
+        "mv support/bazel/BUILD.bazel BUILD.bazel",
+        "mv support/bazel/WORKSPACE.bazel WORKSPACE.bazel",
+    ],
+    sha256 = "02289e247321e4984fcfc185e1bcaf6ace9622ad6e034f326677da4b53c7a92d",
+    strip_prefix = "fmt-%s" % FMT_VERSION,
+    url = "https://github.com/fmtlib/fmt/archive/%s.tar.gz" % FMT_VERSION,
+)
+
 BOOST_UT_VERSION = "e53a47d37bc594e80bd5f1b8dc1ade8dce4429d3"
 
 http_archive(

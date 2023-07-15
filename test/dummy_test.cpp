@@ -1,9 +1,15 @@
 #include <boost/ut.hpp>
 
+#include <fmt/core.h>
+
 auto main() -> int
 {
   using ::boost::ut::expect;
   using ::boost::ut::test;
 
-  test("true is true") = [] { expect(true); };
+  test("true is true") = [] {
+    const auto s = fmt::format("The answer is {}.", 42);
+
+    expect("The answer is 42." == s);
+  };
 }
