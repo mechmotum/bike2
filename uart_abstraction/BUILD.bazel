@@ -1,0 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "fake",
+    srcs = [
+        "fake/HardwareSerial.cpp",
+    ],
+    hdrs = ["HardwareSerial.hpp"],
+    visibility = ["//:__subpackages__"],
+)

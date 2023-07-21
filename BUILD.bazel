@@ -11,6 +11,14 @@ filegroup(
 )
 
 filegroup(
+    name = "format_ignore",
+    srcs = [
+        "//third_party/vesc_uart",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
     name = "tidy_config",
     srcs = [".clang-tidy"],
     visibility = ["//visibility:public"],
@@ -20,6 +28,7 @@ clang_format_update(
     name = "clang-format",
     binary = "@llvm_16_toolchain//:clang-format",
     config = ":format_config",
+    ignore = ":format_ignore",
 )
 
 clang_tidy_apply_fixes(
