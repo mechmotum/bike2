@@ -1,0 +1,178 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+COMMON_CXX_WARNINGS = [
+    "-Werror",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-Wconversion",
+    "-Wnon-virtual-dtor",
+    "-Wold-style-cast",
+    "-Wcast-align",
+    "-Wunused",
+    "-Woverloaded-virtual",
+    "-Wmisleading-indentation",
+    "-Wnull-dereference",
+    "-Wdouble-promotion",
+    "-Wformat=2",
+    "-Wimplicit-fallthrough",
+]
+
+# Bazel sends stdout/stderr to file so we cannot use `-fdiagnostics-color=auto`
+
+# https://github.com/bazelbuild/bazel/issues/6046#issuecomment-626941725
+#
+# Clang will also require libtinfo.so.5 with `-fdiagnostics-color=always`
+# https://github.com/mun-lang/mun/issues/191#issuecomment-753402659
+# https://reviews.llvm.org/D42274
+load("//tools:host_system_libraries.bzl", "host_system_libraries")
+
+host_system_libraries(
+    name = "host_system_libraries",
+    find = ["libtinfo.so.5"],
+)
+
+load("@host_system_libraries//:defs.bzl", "HOST_SYSTEM_LIBRARIES")
+
+# Note: not correct on MacOS.
+LLVM_COLOR_FLAGS = ["-fdiagnostics-color=always" if "libinfo.so.5" in HOST_SYSTEM_LIBRARIES else ""]
+
+BAZEL_BOOTLIN_COMMIT = "eae108c14445074ab5c8ae7f5338eebf1873ae69"
+
+http_archive(
+    name = "bazel_bootlin",
+    sha256 = "ea76bcd8fc27da13bc79acc4844baadc563e07888a128265ca74d07cd58c1f34",
+    strip_prefix = "bazel_bootlin-%s" % BAZEL_BOOTLIN_COMMIT,
+    url = "https://github.com/oliverlee/bazel_bootlin/archive/%s.tar.gz" % BAZEL_BOOTLIN_COMMIT,
+)
+
+load("@bazel_bootlin//:defs.bzl", "bootlin_toolchain")
+
+# for mapping from buildroot version to gcc version
+# see https://toolchains.bootlin.com/releases_x86-64.html
+bootlin_toolchain(
+    name = "gcc_12_toolchain",
+    architecture = "x86-64",
+    buildroot_version = "bleeding-edge-2022.08-1",
+    extra_cxx_flags = [
+        "-fdiagnostics-color=always",
+        "-std=c++23",
+        "-Wduplicated-cond",
+        "-Wduplicated-branches",
+        "-Wlogical-op",
+        "-Wuseless-cast",
+        "-Wshadow=compatible-local",  # Equivalent to -Wshadow on llvm. GCC default is stupid.
+    ] + COMMON_CXX_WARNINGS,
+    libc_impl = "glibc",
+)
+
+BAZEL_TOOLCHAIN_VERSION = "c65ef7a45907016a754e5bf5bfabac76eb702fd3"
+
+http_archive(
+    name = "bazel_toolchain",
+    sha256 = "c70777b0aa877085323aa1ced3b6e011811a9800092e837043aa5f678d838301",
+    strip_prefix = "bazel-toolchain-%s" % BAZEL_TOOLCHAIN_VERSION,
+    url = "https://github.com/grailbio/bazel-toolchain/archive/%s.tar.gz" % BAZEL_TOOLCHAIN_VERSION,
+)
+
+load("//tools:llvm_toolchain_dependencies.bzl", "llvm_toolchain_dependencies")
+
+llvm_toolchain_dependencies()
+
+load("//tools:llvm_toolchain.bzl", "llvm_toolchain")
+
+llvm_toolchain(
+    name = "llvm_16_toolchain",
+    cxx_flags = {
+        "": [
+            "-stdlib=libc++",
+            "-std=c++2b",
+            "-Wshadow",
+        ] + COMMON_CXX_WARNINGS + LLVM_COLOR_FLAGS,
+    },
+    # Link UBSan C++ runtime libraries if the `ubsan` feature is enabled
+    # https://github.com/bazelbuild/bazel/issues/12797#issuecomment-980641064
+    # use `link_libs` to prevent overriding default `link_flags`
+    # https://github.com/grailbio/bazel-toolchain/blob/ceeedcc4464322e05fe5b8df3749cc02273ee083/toolchain/cc_toolchain_config.bzl#L148-L150
+    link_libs = {
+        "": ["-fsanitize-link-c++-runtime"],
+    },
+    linux_x86_64_sysroot = "@gcc_12_toolchain_files//x86_64-buildroot-linux-gnu/sysroot",
+    llvm_version = "16.0.4",
+)
+
+# register llvm first, it has better error messages
+load("@llvm_16_toolchain//:toolchains.bzl", "llvm_register_toolchains")
+
+llvm_register_toolchains()
+
+register_toolchains(
+    "@gcc_12_toolchain//:toolchain",
+)
+
+BOOST_UT_VERSION = "e53a47d37bc594e80bd5f1b8dc1ade8dce4429d3"
+
+http_archive(
+    name = "boost_ut",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "boost_ut",
+    hdrs = ["include/boost/ut.hpp"],
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "abc90fa389a47504d06a88a56ddc9e580cf2654173bd14d211db714bb111b923",
+    strip_prefix = "ut-%s" % BOOST_UT_VERSION,
+    url = "https://github.com/boost-ext/ut/archive/%s.tar.gz" % BOOST_UT_VERSION,
+)
+
+BAZEL_CLANG_FORMAT_VERSION = "f4198b68887699a4d1862e44458e4969ad69fc8a"
+
+http_archive(
+    name = "bazel_clang_format",
+    sha256 = "bd75df6dae8d290a716e1812c463ef4ab36869b5557d8a6dd6abb8315acfc6ac",
+    strip_prefix = "bazel_clang_format-%s" % BAZEL_CLANG_FORMAT_VERSION,
+    url = "https://github.com/oliverlee/bazel_clang_format/archive/%s.tar.gz" % BAZEL_CLANG_FORMAT_VERSION,
+)
+
+BAZEL_CLANG_TIDY_VERSION = "aae87699cca19d8f6e84538576ab47587043d1d2"
+
+http_archive(
+    name = "bazel_clang_tidy",
+    sha256 = "ee7d89375b5c6554b40ea1b1132a8cf7e3e269f7c2f6b2f595e4c7181d44b736",
+    strip_prefix = "bazel_clang_tidy-%s" % BAZEL_CLANG_TIDY_VERSION,
+    url = "https://github.com/oliverlee/bazel_clang_tidy/archive/%s.tar.gz" % BAZEL_CLANG_TIDY_VERSION,
+)
+
+http_archive(
+    name = "buildifier_prebuilt",
+    sha256 = "e46c16180bc49487bfd0f1ffa7345364718c57334fa0b5b67cb5f27eba10f309",
+    strip_prefix = "buildifier-prebuilt-6.1.0",
+    urls = [
+        "https://github.com/keith/buildifier-prebuilt/archive/6.1.0.tar.gz",
+    ],
+)
+
+load("@buildifier_prebuilt//:deps.bzl", "buildifier_prebuilt_deps")
+
+buildifier_prebuilt_deps()
+
+load("@buildifier_prebuilt//:defs.bzl", "buildifier_prebuilt_register_toolchains")
+
+buildifier_prebuilt_register_toolchains()
+
+COMPILE_COMMANDS_VERSION = "3dddf205a1f5cde20faf2444c1757abe0564ff4c"
+
+http_archive(
+    name = "hedron_compile_commands",
+    sha256 = "3cd0e49f0f4a6d406c1d74b53b7616f5e24f5fd319eafc1bf8eee6e14124d115",
+    strip_prefix = "bazel-compile-commands-extractor-%s" % COMPILE_COMMANDS_VERSION,
+    url = "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/%s.tar.gz" % COMPILE_COMMANDS_VERSION,
+)
+
+load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
+
+hedron_compile_commands_setup()
