@@ -110,6 +110,29 @@ register_toolchains(
     "@gcc_12_toolchain//:toolchain",
 )
 
+ARMA_VERSION = "ee89179212f9e208ad252825bde7520332c2a308"
+
+http_archive(
+    name = "arma",
+    sha256 = "8576d00d93b8430d149cfec6223dd2d1d7c26fa06564d34cc7b4db52fd20d7d2",
+    strip_prefix = "armadillo-code-{commit}".format(
+        commit = ARMA_VERSION,
+    ),
+    url = "https://gitlab.com/conradsnicta/armadillo-code/-/archive/{commit}/armadillo-code-{commit}.tar.gz".format(
+        commit = ARMA_VERSION,
+    ),
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "arma",
+    hdrs = glob(["include/**"]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)
+""",
+)
+
 FMT_VERSION = "dd5a9691f992f7f257243cbecb516a4ab584dcde"
 
 http_archive(

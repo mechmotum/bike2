@@ -5,6 +5,7 @@ cc_test(
     timeout = "short",
     srcs = ["dummy_test.cpp"],
     deps = [
+        "@arma",
         "@boost_ut",
         "@fmt",
     ],

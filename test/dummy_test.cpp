@@ -1,6 +1,7 @@
 #include <boost/ut.hpp>
 
 #include <fmt/core.h>
+#include <armadillo>
 
 auto main() -> int
 {
