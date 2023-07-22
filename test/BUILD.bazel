@@ -7,5 +7,7 @@ cc_test(
     deps = [
         "@boost_ut",
         "@fmt",
+        "@linalg",
+        "@mdspan",
     ],
 )
