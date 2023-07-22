@@ -7,14 +7,15 @@ build:gcc12   --extra_toolchains=//toolchain:gcc12
 build:clang-format --aspects @bazel_clang_format//:defs.bzl%clang_format_aspect
 build:clang-format --@bazel_clang_format//:binary=@llvm_16_toolchain//:clang-format
 build:clang-format --@bazel_clang_format//:config=//:format_config
+build:clang-format --@bazel_clang_format//:ignore=//:format_ignore
 build:clang-format --output_groups=report
 build:clang-format --keep_going
 
 build:clang-tidy-base --config=clang16
 build:clang-tidy-base --aspects @bazel_clang_tidy//clang_tidy:clang_tidy.bzl%clang_tidy_aspect
-build:clang-tidy-base --@bazel_clang_tidy//:clang_tidy_config=//:tidy_config
 build:clang-tidy-base --output_groups=report
 build:clang-tidy-base --keep_going
+build:clang-tidy-base --spawn_strategy=local
 
 build:verbose-clang-tidy --config=clang-tidy-base
 build:verbose-clang-tidy --@bazel_clang_tidy//:clang_tidy_executable=//tools:verbose-clang-tidy

@@ -1,0 +1,32 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "vesc_uart",
+    srcs = [
+        "src/VescUart.cpp",
+        "src/buffer.cpp",
+        "src/compatability/WProgram.h",
+        "src/crc.cpp",
+        "src/includes/buffer.h",
+        "src/includes/crc.h",
+        "src/includes/datatypes.h",
+        "src/includes/local_datatypes.h",
+    ],
+    hdrs = ["VescUart.h"],
+    copts = [
+        "-Wno-conversion",
+        "-Wno-double-promotion",
+        "-Wno-old-style-cast",
+        "-Wno-unused-but-set-parameter",
+        "-xc++",
+    ],
+    includes = [
+        ".",
+        "src/compatability",
+        "src/includes",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//uart_abstraction:fake",
+    ],
+)

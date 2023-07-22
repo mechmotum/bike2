@@ -143,20 +143,20 @@ cc_library(
     url = "https://github.com/boost-ext/ut/archive/%s.tar.gz" % BOOST_UT_VERSION,
 )
 
-BAZEL_CLANG_FORMAT_VERSION = "f4198b68887699a4d1862e44458e4969ad69fc8a"
+BAZEL_CLANG_FORMAT_VERSION = "0436f63ce242cc3682b4e8dc8455a4ff725b5c8f"
 
 http_archive(
     name = "bazel_clang_format",
-    sha256 = "bd75df6dae8d290a716e1812c463ef4ab36869b5557d8a6dd6abb8315acfc6ac",
+    sha256 = "604a32981039812f3c61f0212114c8bcc1f73289e5fc8c0c40ced1c9280e62d2",
     strip_prefix = "bazel_clang_format-%s" % BAZEL_CLANG_FORMAT_VERSION,
     url = "https://github.com/oliverlee/bazel_clang_format/archive/%s.tar.gz" % BAZEL_CLANG_FORMAT_VERSION,
 )
 
-BAZEL_CLANG_TIDY_VERSION = "aae87699cca19d8f6e84538576ab47587043d1d2"
+BAZEL_CLANG_TIDY_VERSION = "7a77cacef6294e8df644c66c19190ed95d3d35cf"
 
 http_archive(
     name = "bazel_clang_tidy",
-    sha256 = "ee7d89375b5c6554b40ea1b1132a8cf7e3e269f7c2f6b2f595e4c7181d44b736",
+    sha256 = "b4df2f62a839dfe991bfa22750afc7577ce76740aee44efb321ea4a79ecd5146",
     strip_prefix = "bazel_clang_tidy-%s" % BAZEL_CLANG_TIDY_VERSION,
     url = "https://github.com/oliverlee/bazel_clang_tidy/archive/%s.tar.gz" % BAZEL_CLANG_TIDY_VERSION,
 )
