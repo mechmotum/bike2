@@ -124,6 +124,61 @@ http_archive(
     url = "https://github.com/fmtlib/fmt/archive/%s.tar.gz" % FMT_VERSION,
 )
 
+MDSPAN_VERSION = "9d0a451e11177cbdeaef035c7914b0aa73ddd1e2"
+
+http_archive(
+    name = "mdspan",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "mdspan",
+    hdrs = glob(["include/**"]),
+    includes = ["include"],
+    defines = [
+        "MDSPAN_USE_BRACKET_OPERATOR=1",
+        "MDSPAN_USE_PAREN_OPERATOR=1", # needed by stdBLAS
+    ],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "d7751653cd93f3e73118796fd5f42f0424ef20ffeaa224005b4008b8987e6d81",
+    strip_prefix = "mdspan-%s" % MDSPAN_VERSION,
+    url = "https://github.com/kokkos/mdspan/archive/%s.tar.gz" % MDSPAN_VERSION,
+)
+
+LINALG_VERSION = "d1a1a116a1a62a03d726d70220e573aa7c3dba68"
+
+http_archive(
+    name = "linalg",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+# It appears this can be empty if we don't use atomic ref, blas, or kokkos
+# https://github.com/kokkos/stdBLAS/blob/main/include/experimental/__p1673_bits/linalg_config.h.in
+genrule(
+    name = "linalg_config",
+    outs = ["include/experimental/__p1673_bits/linalg_config.h"],
+    cmd = "touch $@",
+)
+
+cc_library(
+    name = "linalg",
+    srcs = ["linalg_config"],
+    hdrs = glob(["include/**"]),
+    includes = [
+        "include",
+        "include/experimental",
+    ],
+    deps = ["@mdspan"],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "2cff70d080186949dcfa6da509eab41c3ba25df23c15bcbca8d810d0a1370bdb",
+    strip_prefix = "stdBLAS-%s" % LINALG_VERSION,
+    url = "https://github.com/kokkos/stdblas/archive/%s.tar.gz" % LINALG_VERSION,
+)
+
 BOOST_UT_VERSION = "e53a47d37bc594e80bd5f1b8dc1ade8dce4429d3"
 
 http_archive(
