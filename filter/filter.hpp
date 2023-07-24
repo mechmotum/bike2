@@ -6,7 +6,7 @@
 // Low and high pass filters
 // https://gitlab.com/mechmotum/row_filter/-/blob/master/row_filter/complementary.py
 
-namespace complementary_filter {
+namespace filter {
 
 namespace mp = mp_units;
 namespace si = mp_units::si;
@@ -133,4 +133,4 @@ struct highpass
   }
 };
 
-}  // namespace complementary_filter
+}  // namespace filter
