@@ -11,3 +11,14 @@ cc_test(
         "@mdspan",
     ],
 )
+
+cc_test(
+    name = "units_test",
+    timeout = "short",
+    srcs = ["units_test.cpp"],
+    deps = [
+        "@boost_ut",
+        "@fmt",
+        "@mp_units",
+    ],
+)

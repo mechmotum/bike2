@@ -179,6 +179,70 @@ cc_library(
     url = "https://github.com/kokkos/stdblas/archive/%s.tar.gz" % LINALG_VERSION,
 )
 
+GSL_LITE_VERSION = "a8c7e5bbbd08841836f9b92d72747fb8769dbec4"
+
+http_archive(
+    name = "gsl_lite",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "gsl_lite",
+    hdrs = ["include/gsl/gsl-lite.hpp"],
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "f9edeec2b517dbb57c5688150db56c90f5c4922ef8aa8d15cfe532fa42058792",
+    strip_prefix = "gsl-lite-%s" % GSL_LITE_VERSION,
+    url = "https://github.com/gsl-lite/gsl-lite/archive/%s.tar.gz" % GSL_LITE_VERSION,
+)
+
+MP_UNITS_VERSION = "60a564a86700804e306f0d73a1521ea6e4abe377"
+
+http_archive(
+    name = "mp_units",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "mp_units",
+    hdrs = glob(["src/**"]),
+    includes = [
+        "src/core-fmt/include",
+        "src/core-io/include",
+        "src/core/include",
+        "src/systems/angular/include",
+        "src/systems/cgs/include",
+        "src/systems/hep/include",
+        "src/systems/iau/include",
+        "src/systems/iec80000/include",
+        "src/systems/imperial/include",
+        "src/systems/international/include",
+        "src/systems/isq/include",
+        "src/systems/isq_angle/include",
+        "src/systems/natural/include",
+        "src/systems/si/include",
+        "src/systems/typographic/include",
+        "src/systems/usc/include",
+        "src/utility/include",
+    ],
+    deps = [
+        "@gsl_lite",
+    ],
+    visibility = ["//visibility:public"],
+)
+""",
+    # Fix Clang builds by defining constructor as public
+    # https://github.com/mpusz/mp-units/issues/473
+    #
+    patch_args = ["-p1"],
+    patches = ["//third_party:mp-units-clang-priv-ctor.patch"],
+    sha256 = "2c48171815909da836300d50a40e396412cb4881794b4cb5d13dcef858c46da1",
+    strip_prefix = "mp-units-%s" % MP_UNITS_VERSION,
+    url = "https://github.com/mpusz/mp-units/archive/%s.tar.gz" % MP_UNITS_VERSION,
+)
+
 BOOST_UT_VERSION = "e53a47d37bc594e80bd5f1b8dc1ade8dce4429d3"
 
 http_archive(

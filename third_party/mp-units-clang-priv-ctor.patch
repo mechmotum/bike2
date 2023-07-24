@@ -1,0 +1,12 @@
+diff --git a/src/core/include/mp-units/quantity.h b/src/core/include/mp-units/quantity.h
+index 3d3642b3..5e16eff4 100644
+--- a/src/core/include/mp-units/quantity.h
++++ b/src/core/include/mp-units/quantity.h
+@@ -321,6 +321,7 @@ private:
+     requires quantity<R2, std::remove_cvref_t<Rep2>>::_rep_safe_constructible_
+   friend constexpr quantity<R2, std::remove_cvref_t<Rep2>> make_quantity(Rep2&&);
+ 
++public:
+   template<typename Value>
+     requires detail::RepSafeConstructibleFrom<rep, Value&&, unit>
+   constexpr explicit quantity(Value&& v) : number_(std::forward<Value>(v))
