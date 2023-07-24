@@ -35,6 +35,9 @@ Checks: >
     # https://reviews.llvm.org/D95714?id=320393,
     -modernize-use-nullptr,
 
+    # segfaults with mp-units,
+    -modernize-use-trailing-return-type,
+
     # disable common aliases,
     -cppcoreguidelines-avoid-c-arrays,
     -cppcoreguidelines-avoid-magic-numbers,
