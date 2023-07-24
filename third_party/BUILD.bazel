@@ -1,1 +1,4 @@
-exports_files(["mp-units-clang-priv-ctor.patch"])
+exports_files([
+    "mp-units-clang-priv-ctor.patch",
+    "mp-units-clang-type-identity.patch",
+])

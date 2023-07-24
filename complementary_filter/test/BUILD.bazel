@@ -1,0 +1,11 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+cc_test(
+    name = "complementary_filter_test",
+    timeout = "short",
+    srcs = ["complementary_filter_test.cpp"],
+    deps = [
+        "//complementary_filter",
+        "@boost_ut",
+    ],
+)

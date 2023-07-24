@@ -1,0 +1,8 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "complementary_filter",
+    hdrs = ["complementary_filter.hpp"],
+    visibility = ["//:__subpackages__"],
+    deps = ["@mp_units"],
+)
