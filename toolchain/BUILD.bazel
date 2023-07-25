@@ -22,11 +22,28 @@ alias(
     actual = ":gcc12",
 )
 
+config_setting(
+    name = "linux_aarch64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+)
+
+config_setting(
+    name = "linux_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
 alias(
     name = "clang16",
     actual = select({
         "@platforms//os:macos": "@llvm_16_toolchain//:cc-toolchain-aarch64-darwin",
-        "//conditions:default": "@llvm_16_toolchain//:cc-toolchain-x86_64-linux",
+        ":linux_aarch64": "@llvm_16_toolchain//:cc-toolchain-aarch64-linux",
+        ":linux_x86_64": "@llvm_16_toolchain//:cc-toolchain-x86_64-linux",
     }),
 )
 
@@ -36,13 +53,14 @@ alias(
 )
 
 # Doesn't work on MacOS: https://github.com/grailbio/bazel-toolchain/issues/192
-config_setting(
-    name = "linux",
-    constraint_values = ["@platforms//os:linux"],
-)
-
 linux_only = select({
-    "linux": [],
+    ":linux_aarch64": [],
+    ":linux_x86_64": [],
+    "//conditions:default": ["@platforms//:incompatible"],
+})
+
+linux_x86_64_only = select({
+    ":linux_x86_64": [],
     "//conditions:default": ["@platforms//:incompatible"],
 })
 
@@ -51,7 +69,7 @@ cc_binary(
     srcs = ["asan_feature_available.cpp"],
     copts = ["-O0"],
     features = ["asan"],
-    target_compatible_with = linux_only,
+    target_compatible_with = linux_x86_64_only,
 )
 
 sh_test(
