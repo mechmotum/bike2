@@ -98,7 +98,10 @@ llvm_toolchain(
         "": ["-fsanitize-link-c++-runtime"],
     },
     linux_x86_64_sysroot = "@gcc_12_toolchain_files//x86_64-buildroot-linux-gnu/sysroot",
-    llvm_version = "16.0.4",
+    llvm_versions = {
+        "": "16.0.4",
+        "linux-aarch64": "16.0.3",
+    },
 )
 
 # register llvm first, it has better error messages

@@ -114,7 +114,8 @@ def llvm_toolchain(linux_x86_64_sysroot = "", **kwargs):
 
     _llvm_toolchain_files(
         name = kwargs["name"] + "_files",
-        llvm_version = kwargs["llvm_version"],
+        llvm_version = kwargs.get("llvm_version", None),
+        llvm_versions = kwargs.get("llvm_versions", None),
     )
 
     _patch_dynamic_linker(
@@ -168,7 +169,13 @@ def llvm_toolchain(linux_x86_64_sysroot = "", **kwargs):
         ],
     )
 
-    major_version = kwargs["llvm_version"].split(".")[0]
+    if "llvm_version" in kwargs:
+        version = kwargs["llvm_version"]
+    else:
+        versions = kwargs["llvm_versions"]
+        version = versions.get("linux-x86_64", None) or versions[""]
+    major_version = version.split(".")[0]
+
     kwargs["cxx_builtin_include_directories"] = _extend_linux_x86_64_key(
         kwargs.get("cxx_builtin_include_directories", {"": []}),
         [
