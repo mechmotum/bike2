@@ -113,6 +113,27 @@ register_toolchains(
     "@gcc_12_toolchain//:toolchain",
 )
 
+ASIO_VERSION = "d6b95c0188e0359a8cdbdb6571f0cbacf11a538c"
+
+http_archive(
+    name = "asio",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "asio",
+    hdrs = glob(["asio/include/**"]),
+    includes = ["asio/include"],
+    defines = [
+    ],
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "c4eae0910b8fcf2df8d32dc0ab67b032e9876491a5968faad32d330fd41e119c",
+    strip_prefix = "asio-%s" % ASIO_VERSION,
+    url = "https://github.com/chriskohlhoff/asio/archive/%s.tar.gz" % ASIO_VERSION,
+)
+
 FMT_VERSION = "dd5a9691f992f7f257243cbecb516a4ab584dcde"
 
 http_archive(
