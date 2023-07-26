@@ -38,6 +38,14 @@ config_setting(
     ],
 )
 
+# With GCC and tsan:
+# error: 'atomic_thread_fence' is not supported with '-fsanitize=thread' [-Werror=tsan]
+config_setting(
+    name = "gcc_tsan",
+    flag_values = {"@bazel_tools//tools/cpp:compiler": "gcc"},
+    values = {"features": "tsan"},
+)
+
 alias(
     name = "clang16",
     actual = select({

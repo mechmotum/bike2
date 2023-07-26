@@ -17,7 +17,7 @@ using boolean = bool;
 #include <cassert>
 #include <chrono>
 #include <thread>
-auto delay(int milliseconds) -> void
+inline auto delay(int milliseconds) -> void
 {
   assert((milliseconds >= 0) && "A negative sleep duration requested");
 

@@ -26,7 +26,8 @@ cc_library(
         "src/includes",
     ],
     visibility = ["//:__subpackages__"],
-    deps = [
-        "//uart_abstraction:fake",
-    ],
+    deps = select({
+        "//toolchain:linux_aarch64": ["//uart_abstraction:rpi"],
+        "//conditions:default": ["//uart_abstraction:fake"],
+    }),
 )

@@ -8,3 +8,17 @@ cc_library(
     hdrs = ["HardwareSerial.hpp"],
     visibility = ["//:__subpackages__"],
 )
+
+cc_library(
+    name = "rpi",
+    srcs = [
+        "rpi/HardwareSerial.cpp",
+    ],
+    hdrs = ["HardwareSerial.hpp"],
+    target_compatible_with = select({
+        "//toolchain:gcc_tsan": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//:__subpackages__"],
+    deps = ["@asio"],
+)
