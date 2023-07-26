@@ -7,6 +7,8 @@
 
 struct HardwareSerial
 {
+  HardwareSerial(const char* dev);
+
   [[nodiscard]]
   auto available() const -> bool;
 

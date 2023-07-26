@@ -1,5 +1,7 @@
 #include "uart_abstraction/HardwareSerial.hpp"
 
+HardwareSerial::HardwareSerial(const char*) {}
+
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 auto HardwareSerial::available() const -> bool
 {
@@ -18,4 +20,4 @@ auto HardwareSerial::write(
 {}
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-HardwareSerial Serial;
+HardwareSerial Serial{""};
