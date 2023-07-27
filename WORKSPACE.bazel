@@ -286,7 +286,10 @@ cc_library(
     # https://github.com/mpusz/mp-units/issues/473
     #
     patch_args = ["-p1"],
-    patches = ["//third_party:mp-units-clang-priv-ctor.patch"],
+    patches = [
+        "//third_party:mp-units-clang-priv-ctor.patch",
+        "//third_party:mp-units-clang-type-identity.patch",
+    ],
     sha256 = "2c48171815909da836300d50a40e396412cb4881794b4cb5d13dcef858c46da1",
     strip_prefix = "mp-units-%s" % MP_UNITS_VERSION,
     url = "https://github.com/mpusz/mp-units/archive/%s.tar.gz" % MP_UNITS_VERSION,

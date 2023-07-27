@@ -1,0 +1,12 @@
+diff --git a/src/core/include/mp-units/bits/external/type_list.h b/src/core/include/mp-units/bits/external/type_list.h
+index 5369ce18..80b66e06 100644
+--- a/src/core/include/mp-units/bits/external/type_list.h
++++ b/src/core/include/mp-units/bits/external/type_list.h
+@@ -24,6 +24,7 @@
+ 
+ #include <mp-units/bits/external/hacks.h>  // IWYU pragma: keep
+ #include <cstddef>
++#include <type_traits>
+ #include <utility>
+ 
+ MP_UNITS_DIAGNOSTIC_PUSH
