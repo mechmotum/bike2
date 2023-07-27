@@ -31,3 +31,11 @@ cc_library(
         "//conditions:default": ["//uart_abstraction:fake"],
     }),
 )
+
+cc_library(
+    name = "extra",
+    srcs = ["src/extra.cpp"],
+    hdrs = ["extra.hpp"],
+    visibility = ["//:__subpackages__"],
+    deps = [":vesc_uart"],
+)

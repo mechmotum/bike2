@@ -14,6 +14,9 @@ auto HardwareSerial::read() const -> std::uint8_t
   return {};
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+auto HardwareSerial::read(std::span<std::uint8_t>) const -> void {}
+
 auto HardwareSerial::write(
     [[maybe_unused]] std::uint8_t* buffer,
     [[maybe_unused]] std::size_t size) const -> void
