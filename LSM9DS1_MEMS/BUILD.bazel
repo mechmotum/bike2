@@ -1,0 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "LSM9DS1_MEMS",
+    hdrs = ["LSM9DS1_MEMS.hpp"],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//system:libi2c-dev",
+    ],
+)
