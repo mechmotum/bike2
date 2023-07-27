@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@host_system_libraries//:defs.bzl", "HOST_SYSTEM_LIBRARIES")
 
 cc_binary(
@@ -7,17 +7,11 @@ cc_binary(
     deps = ["//third_party/vesc_uart"],
 )
 
-has_libi2c = [] if ("libi2c.so.0" in HOST_SYSTEM_LIBRARIES) else ["@platforms//:incompatible"]
-
 cc_binary(
     name = "i2c",
     srcs = ["i2c.cpp"],
-    target_compatible_with = has_libi2c,
     deps = [
         "@fmt",
-    ] + select({
-        # x86-64 uses a hermetic sysroot and system libraries need to be explicitly specified
-        "//toolchain:linux_x86_64": ["@linux-x86_64_usr_i2c"],
-        "//conditions:default": [],
-    }),
+	"//system:libi2c-dev",
+    ],
 )

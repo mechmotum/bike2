@@ -1,0 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@host_system_libraries//:defs.bzl", "HOST_SYSTEM_LIBRARIES")
+
+has_libi2c = [] if ("libi2c.so.0" in HOST_SYSTEM_LIBRARIES) else ["@platforms//:incompatible"]
+
+cc_library(
+    name = "libi2c-dev",
+    linkopts = ["-li2c"],
+    target_compatible_with = has_libi2c,
+    visibility = ["//:__subpackages__"],
+    deps = select({
+        # x86-64 uses a hermetic sysroot and system libraries need to be explicitly specified
+        "//toolchain:linux_x86_64": ["@linux-x86_64_usr_i2c"],
+        "//conditions:default": [],
+    }),
+)
+
