@@ -1,0 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "balance",
+    srcs = ["balance.cpp"],
+    deps = [
+        "//LSM9DS1_MEMS",
+        "//filter",
+        "//third_party/vesc_uart",
+        "//third_party/vesc_uart:extra",
+        "@fmt",
+    ],
+)
