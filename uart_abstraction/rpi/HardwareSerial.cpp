@@ -66,6 +66,17 @@ auto HardwareSerial::read() const -> std::uint8_t
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+auto HardwareSerial::read(std::span<std::uint8_t> buf) const -> void
+{
+  auto buf_ = asio::buffer(buf.data(), buf.size());
+
+  while (buf_.size() != 0) {
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+    buf_ += underlying->read_some(buf_);
+  }
+}
+
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 auto HardwareSerial::write(std::uint8_t* buffer, std::size_t size) const -> void
 {
   for (auto buf = asio::buffer(buffer, size); buf.size() != 0;) {
