@@ -1,40 +1,43 @@
-extern "C" {
-#include <i2c/smbus.h>
-#include <linux/i2c-dev.h>
-}
+#include "LSM9DS1_MEMS/LSM9DS1_MEMS.hpp"
 
-#include <cassert>
-#include <fcntl.h>
+#include <chrono>
 #include <fmt/core.h>
-#include <sys/ioctl.h>
-
-// https://docs.kernel.org/i2c/dev-interface.html
+#include <thread>
 
 auto main(int argc, char** argv) -> int
 {
-  assert(
-      false and
-      "This example is only intended to test building and linking "
-      "with libi2c");
-
   if (argc < 2) {
     fmt::print("./i2c <device>");
     return 1;
   }
 
-  const auto fd = ::open(argv[1], O_RDWR);
-  if (fd < 0) {
-    fmt::print("error in opening device");
-    return 1;
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  const auto& device = argv[1];
+  constexpr auto i2c_address = 0x6b;
+  auto sensor = LSM9DS1{device, i2c_address};
+
+  // NOLINTNEXTLINE(readability-magic-numbers)
+  for (auto i = 0; i < 100; ++i) {
+    (void)sensor.read_gx();
+    (void)sensor.read_accel();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds{1});
   }
 
-  constexpr auto addr = int{0x40}; /* The I2C address */
+  while (true) {
+    auto gx = sensor.read_gx();
+    fmt::print("gx raw: {}\n", gx);
 
-  if (::ioctl(fd, I2C_SLAVE, addr) < 0) {
-    fmt::print("error specifying i2c device address");
-    return 1;
+    auto accel = sensor.read_accel();
+    fmt::print(
+        "accel y raw: {}, accel z raw: {}, theta: {}\n",
+        accel.y,
+        accel.z,
+        accel.get_theta());
+
+    constexpr auto delay = std::chrono::milliseconds{100};
+    std::this_thread::sleep_for(delay);
   }
 
-  ::i2c_smbus_read_block_data(fd, 0, nullptr);
   return 0;
 }

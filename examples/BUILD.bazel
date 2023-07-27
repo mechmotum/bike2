@@ -10,7 +10,7 @@ cc_binary(
     name = "i2c",
     srcs = ["i2c.cpp"],
     deps = [
-        "//system:libi2c-dev",
+        "//LSM9DS1_MEMS",
         "@fmt",
     ],
 )
