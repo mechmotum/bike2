@@ -7,6 +7,11 @@
 #include <fmt/core.h>
 #include <thread>
 
+#include <array>
+#include <cstdint>
+
+auto payload_buffer = std::array<std::uint8_t, 256>{};
+
 auto main() -> int
 {
   const auto current = -10.0F;
@@ -16,7 +21,8 @@ auto main() -> int
     fmt::print("current: {}\n", std::int16_t(current));
 
     const auto start = std::chrono::steady_clock::now();
-    fmt::print("rpm: {}\n", ::vesc::extra::read_rpm());
+    //fmt::print("rpm: {}\n", ::vesc::extra::read_rpm());
+    ::vesc::extra::read_payload(std::span{payload_buffer});
 
     const auto elapsed = std::chrono::steady_clock::now() - start;
     fmt::print("{}\n", std::chrono::duration<float>{elapsed}.count());

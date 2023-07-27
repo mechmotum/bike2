@@ -8,13 +8,20 @@
 #include <cstddef>
 #include <cstring>
 
+#include <iostream>
+
 namespace {
 
 static constexpr auto serial_device = 0;
 
 auto payload_buffer = std::array<std::uint8_t, 256>{};
 
-auto cmd_get_values = std::uint8_t{COMM_GET_VALUES};
+// try to use COMM_GET_VALUES_SELECTIVE
+constexpr std::uint8_t rpm_bit = 1U << 7;
+auto cmd_get_values = std::array<std::uint8_t, 5>{
+  COMM_GET_VALUES, rpm_bit, 0x00, 0x00, 0x00
+};
+// auto cmd_get_values = std::uint8_t{COMM_GET_VALUES, 0xFF, 0xFF, 0xFF, 0xFF};
 
 }  // namespace
 
@@ -24,7 +31,7 @@ namespace vesc::extra {
 
 auto read_payload(std::span<std::uint8_t> buf) -> void
 {
-  ::PackSendPayload(&cmd_get_values, sizeof(cmd_get_values), serial_device);
+  ::PackSendPayload(cmd_get_values.data(), sizeof(cmd_get_values), serial_device);
 
   {
     [[maybe_unused]] const auto version = Serial.read();
@@ -38,6 +45,8 @@ auto read_payload(std::span<std::uint8_t> buf) -> void
       buf.size() >= payload_size and
       "`buf` is not large enough to hold "
       "message");
+
+  std::cout << "payload size: " << static_cast<int>(payload_size) << '\n';
 
   const auto message =
       std::span{buf.data(), std::size_t(payload_size + footer_size)};
