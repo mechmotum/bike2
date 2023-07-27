@@ -1,13 +1,14 @@
 """
-Dependencies:
-
-    - matplotlib
-    - numpy
-    - pandas
-
 Use as::
 
     python plot_data /path/to/csv/file.csv
+
+Dependencies:
+
+    - python
+    - matplotlib
+    - numpy
+    - pandas
 
 """
 import argparse
@@ -25,7 +26,8 @@ def plot(csvfile):
     time : [s]
     ay : body fixed lateral accelerometer component [m/s/s]
     az : body fixed vertical accelerometer component [m/s/s]
-    wz : body fixed roll angular rate [rad/s]
+    wx : body fixed roll angular rate [rad/s]
+    wm : reaction wheel angular rate [rad/s]
     theta_a : angle from accelerometer [rad]
     theta_g : angle from gyroscope [rad]
     theta_af : low pass filtered accelerometer angle [rad]
@@ -40,7 +42,10 @@ def plot(csvfile):
 
     df[['ay', 'az']].plot(ax=axes[0])
 
-    df['wx'].plot(ax=axes[1])
+    if 'wm' in df.columns:
+        df[['wx', 'wm']].apply(np.rad2deg).plot(ax=axes[1])
+    else:
+        df['wx'].apply(np.rad2deg).plot(ax=axes[1])
 
     df[['theta_a', 'theta_af']].apply(np.rad2deg).plot(ax=axes[2])
 
@@ -57,6 +62,5 @@ if __name__ == "__main__":
     parser.add_argument('csvfile')
     args = parser.parse_args()
 
-    axis = plot(args.csvfile)
-#      axis[0].
+    plot(args.csvfile)
     plt.show()
