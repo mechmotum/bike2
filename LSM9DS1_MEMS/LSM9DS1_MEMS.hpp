@@ -70,7 +70,9 @@ extern "C" {
 class LSM9DS1
 {
 public:
-  LSM9DS1(const char* device, uint8_t address)
+  using scalar_type = float;
+
+  LSM9DS1(const char* device)
   {
     // NOLINTBEGIN(cppcoreguidelines-prefer-member-initializer,
     // cppcoreguidelines-pro-type-vararg)
@@ -79,15 +81,17 @@ public:
     // cppcoreguidelines-pro-type-vararg)
     assert((device_ >= 0) and "error in opening device");
 
+    static constexpr auto addr = 0x6B;
+
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-    auto set_addr_status = ::ioctl(device_, I2C_SLAVE, address);
+    auto set_addr_status = ::ioctl(device_, I2C_SLAVE, addr);
     assert((set_addr_status >= 0) and "error specifying i2c device address");
 
     init_gyro();
     init_accel();
   }
 
-  auto read_gx() -> int16_t
+  auto read_gx() const -> std::int16_t
   {
     auto raw = i2c_read(OUT_X_L_G);
     return raw;
@@ -95,14 +99,13 @@ public:
 
   struct Accel
   {
-    int16_t y;
-    int16_t z;
+    std::int16_t y;
+    std::int16_t z;
 
     [[nodiscard]]
-    auto get_theta() const -> float
+    auto get_theta() const -> scalar_type
     {
-      // GCC cannot find `std::atan2f`
-      return std::atan2(float(y), float(z));
+      return std::atan2(scalar_type(y), scalar_type(z));
     }
   };
 
@@ -118,82 +121,105 @@ public:
 private:
   int device_;
 
-  auto i2c_write(uint8_t subaddress, uint8_t data) const -> void
+  auto i2c_write(std::uint8_t subaddress, std::uint8_t data) const -> void
   {
     auto status = ::i2c_smbus_write_byte_data(device_, subaddress, data);
     assert((status == 0) and "Failed to write data");
   }
 
   [[nodiscard]]
-  auto i2c_read(uint8_t subaddress) const -> int16_t
+  auto i2c_read(std::uint8_t subaddress) const -> std::int16_t
   {
     auto response = ::i2c_smbus_read_word_data(device_, subaddress);
     assert((response >= 0) and "Failed to read data");
 
     // NOLINTNEXTLINE(readability-magic-numbers)
-    auto as_s16 = int16_t(response & 0xFFFF);
+    auto as_s16 = std::int16_t(response & 0xFFFF);
 
     return as_s16;
   }
 
   auto init_gyro() -> void
   {
-    uint8_t tempRegValue = 0;
+    // NOLINTBEGIN(readability-magic-numbers)
 
     // CTRL_REG1_G
-    tempRegValue = 0;
-    // NOLINTBEGIN(readability-magic-numbers)
-    tempRegValue |= (1 << 7);
-    tempRegValue |= (1 << 6);
-    // NOLINTEND(readability-magic-numbers)
-    i2c_write(CTRL_REG1_G, tempRegValue);
+    {
+      static constexpr std::uint8_t ODR_60Hz_LPF1_19Hz = 0b010 << 5;
+      static constexpr std::uint8_t FS_245dps = 0b00 << 3;
+      static constexpr std::uint8_t BW_00 = 0b00;
+      i2c_write(CTRL_REG1_G, ODR_60Hz_LPF1_19Hz | FS_245dps | BW_00);
+    }
 
     // CTRL_REG2_G
-    tempRegValue = 0;
-    i2c_write(CTRL_REG2_G, tempRegValue);
+    {
+      static constexpr std::uint8_t INT_SEL = 0b00 << 2;
+      static constexpr std::uint8_t OUT_SEL = 0b00;
+      i2c_write(CTRL_REG2_G, INT_SEL | OUT_SEL);
+    }
 
     // CTRL_REG3_G
-    tempRegValue = 0;
-    i2c_write(CTRL_REG3_G, tempRegValue);
+    {
+      static constexpr std::uint8_t LP_disabled = 0b0 << 7;
+      static constexpr std::uint8_t HPF_disabled = 0b0 << 6;
+      static constexpr std::uint8_t HPCF_G_0000 = 0b0000;
+      i2c_write(CTRL_REG3_G, LP_disabled | HPF_disabled | HPCF_G_0000);
+    }
 
     // CTRL_REG4
-    tempRegValue = 0;
-    tempRegValue |= (1 << 3);  // X axis
-    tempRegValue |= (1 << 1);  // latch interrupt
-    i2c_write(CTRL_REG4, tempRegValue);
+    {
+      static constexpr std::uint8_t Z_disable = 0b0 << 5;
+      static constexpr std::uint8_t Y_disable = 0b0 << 4;
+      static constexpr std::uint8_t X_enable = 0b1 << 3;
+      static constexpr std::uint8_t LatchedInterrupt_disable = 0b0 << 1;
 
-    // CFG_G
-    tempRegValue = 0;
-    i2c_write(INT_GEN_CFG_G, tempRegValue);
+      i2c_write(
+          CTRL_REG4,
+          Z_disable | Y_disable | X_enable | LatchedInterrupt_disable);
+    }
+
+    // NOLINTEND(readability-magic-numbers)
   }
 
   auto init_accel() -> void
   {
-    uint8_t tempRegValue = 0;
+    // NOLINTBEGIN(readability-magic-numbers)
 
     // CTRL_REG5_XL
-    tempRegValue = 0;
-    // NOLINTBEGIN(readability-magic-numbers)
-    tempRegValue |= (1 << 5);
-    tempRegValue |= (1 << 4);
-    // NOLINTEND(readability-magic-numbers)
-    i2c_write(CTRL_REG5_XL, tempRegValue);
+    {
+      static constexpr std::uint8_t DEC_none = 0b00 << 6;
+      static constexpr std::uint8_t Z_enable = 0b1 << 5;
+      static constexpr std::uint8_t Y_enable = 0b1 << 4;
+      static constexpr std::uint8_t X_disable = 0b0 << 3;
+      i2c_write(CTRL_REG5_XL, DEC_none | Z_enable | Y_enable | X_disable);
+    }
 
     // CTRL_REG6_XL
-    tempRegValue = 0;
-    // NOLINTBEGIN(readability-magic-numbers)
-    tempRegValue |= (1 << 7);
-    tempRegValue |= (1 << 6);
-    // NOLINTEND(readability-magic-numbers)
-    i2c_write(CTRL_REG6_XL, tempRegValue);
+    {
+      static constexpr std::uint8_t ODR_50Hz = 0b010 << 5;
+      static constexpr std::uint8_t FS_4g = 0b10 << 3;
+      static constexpr std::uint8_t BW_sel = 0b1 << 2;
+      static constexpr std::uint8_t BW_50Hz = 0b11;
+      i2c_write(CTRL_REG6_XL, ODR_50Hz | FS_4g | BW_sel | BW_50Hz);
+    }
 
     // CTRL_REG7_XL
-    tempRegValue = 0;
-    i2c_write(CTRL_REG7_XL, tempRegValue);
+    {
+      static constexpr std::uint8_t HR_enable = 0b1 << 7;
+      static constexpr std::uint8_t LPF_ODR_div_50 = 0b00 << 5;
+      static constexpr std::uint8_t LPF_enable = 0b1 << 2;
+      static constexpr std::uint8_t HP_int_disable = 0b0;
+      i2c_write(
+          CTRL_REG7_XL,
+          HR_enable | LPF_ODR_div_50 | LPF_enable | HP_int_disable);
+    }
 
     // CTRL_REG8
-    tempRegValue = 0;
-    tempRegValue |= (1 << 1);  // Endianness
-    i2c_write(CTRL_REG8, tempRegValue);
+    {
+      static constexpr std::uint8_t BLE_little = 0b1 << 1;
+      i2c_write(CTRL_REG8, BLE_little);
+    }
+
+    // NOLINTEND(readability-magic-numbers)
   }
 };

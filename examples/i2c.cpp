@@ -13,8 +13,7 @@ auto main(int argc, char** argv) -> int
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   const auto& device = argv[1];
-  constexpr auto i2c_address = 0x6b;
-  auto sensor = LSM9DS1{device, i2c_address};
+  auto sensor = LSM9DS1{device};
 
   // NOLINTNEXTLINE(readability-magic-numbers)
   for (auto i = 0; i < 100; ++i) {
