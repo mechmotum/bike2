@@ -29,10 +29,35 @@ load("//tools:host_system_libraries.bzl", "host_system_libraries")
 
 host_system_libraries(
     name = "host_system_libraries",
-    find = ["libtinfo.so.5"],
+    find = [
+        "libi2c.so.0",
+        "libtinfo.so.5",
+    ],
 )
 
 load("@host_system_libraries//:defs.bzl", "HOST_SYSTEM_LIBRARIES")
+
+new_local_repository(
+    name = "linux-x86_64_usr_i2c",
+    build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "i2c",
+    srcs = ["lib/x86_64-linux-gnu/libi2c.so"],
+)
+
+cc_library(
+    name = "linux-x86_64_usr_i2c",
+    hdrs = ["include/i2c/smbus.h"],
+    includes = ["include"],
+    linkopts = ["-li2c"],
+    visibility = ["//visibility:public"],
+    deps = [":i2c"],
+)
+""",
+    path = "/usr",
+)
 
 # Note: not correct on MacOS.
 LLVM_COLOR_FLAGS = ["-fdiagnostics-color=always" if "libinfo.so.5" in HOST_SYSTEM_LIBRARIES else ""]
