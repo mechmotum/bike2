@@ -80,7 +80,8 @@ public:
     assert((device_ >= 0) and "error in opening device");
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-    auto set_addr_status = ::ioctl(device_, I2C_SLAVE, address);
+    [[maybe_unused]] const auto set_addr_status =
+        ::ioctl(device_, I2C_SLAVE, address);
     assert((set_addr_status >= 0) and "error specifying i2c device address");
 
     init_gyro();
@@ -120,7 +121,8 @@ private:
 
   auto i2c_write(uint8_t subaddress, uint8_t data) const -> void
   {
-    auto status = ::i2c_smbus_write_byte_data(device_, subaddress, data);
+    [[maybe_unused]] const auto status =
+        ::i2c_smbus_write_byte_data(device_, subaddress, data);
     assert((status == 0) and "Failed to write data");
   }
 

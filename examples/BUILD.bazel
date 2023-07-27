@@ -3,7 +3,11 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 cc_binary(
     name = "vesc_cmd",
     srcs = ["vesc_cmd.cpp"],
-    deps = ["//third_party/vesc_uart"],
+    deps = [
+        "//third_party/vesc_uart",
+        "//third_party/vesc_uart:extra",
+        "@fmt",
+    ],
 )
 
 cc_binary(
