@@ -4,5 +4,4 @@ cc_library(
     name = "filter",
     hdrs = ["filter.hpp"],
     visibility = ["//:__subpackages__"],
-    deps = ["@mp_units"],
 )
