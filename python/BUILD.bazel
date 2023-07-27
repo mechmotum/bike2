@@ -1,0 +1,4 @@
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+# https://github.com/bazelbuild/rules_python/blob/1722988cc407b08a4e7770295452076706823f9d/docs/pip.md#compile_pip_requirements
+compile_pip_requirements(name = "requirements")

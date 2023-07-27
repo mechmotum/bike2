@@ -1,0 +1,14 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@pip//:requirements.bzl", "requirement")
+
+py_binary(
+    name = "plot_data",
+    srcs = ["plot_data.py"],
+    deps = [
+        requirement("numpy"),
+        requirement("matplotlib"),
+        requirement("pandas"),
+        #requirement("tk"),
+        requirement("pyqt5"),
+    ],
+)
