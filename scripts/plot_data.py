@@ -34,16 +34,17 @@ def plot(csvfile):
     theta_af : low pass filtered accelerometer angle [rad]
     theta_gf : band pass filtered gyroscope angle [rad]
     theta : complementary filtered roll angle estimate [rad]
+    i : command motor current [A]
 
     """
 
     df = pd.read_csv(csvfile, index_col='time', sep=";")
 
-    fig, axes = plt.subplots(6, 1, sharex=True)
+    fig, axes = plt.subplots(7, 1, sharex=True)
 
     df[['ay', 'az']].plot(ax=axes[0])
 
-    df['wx'].apply(np.rad2deg).plot(ax=axes[1])
+    df[['wx']].apply(np.rad2deg).plot(ax=axes[1])
 
     df[['theta_a', 'theta_af']].apply(np.rad2deg).plot(ax=axes[2])
 
@@ -52,6 +53,8 @@ def plot(csvfile):
     df[['theta']].apply(np.rad2deg).plot(ax=axes[4])
 
     df[['wm']].apply(lambda radps: radps*60.0/2.0/np.pi).plot(ax=axes[5])
+
+    df[['i']].plot(ax=axes[6])
 
     return axes
 
