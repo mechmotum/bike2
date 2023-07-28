@@ -39,20 +39,19 @@ def plot(csvfile):
 
     df = pd.read_csv(csvfile, index_col='time', sep=";")
 
-    fig, axes = plt.subplots(5, 1, sharex=True)
+    fig, axes = plt.subplots(6, 1, sharex=True)
 
     df[['ay', 'az']].plot(ax=axes[0])
 
-    if 'wm' in df.columns:
-        df[['wx', 'wm']].apply(np.rad2deg).plot(ax=axes[1])
-    else:
-        df['wx'].apply(np.rad2deg).plot(ax=axes[1])
+    df['wx'].apply(np.rad2deg).plot(ax=axes[1])
 
     df[['theta_a', 'theta_af']].apply(np.rad2deg).plot(ax=axes[2])
 
     df[['theta_g', 'theta_gf']].apply(np.rad2deg).plot(ax=axes[3])
 
-    df['theta'].apply(np.rad2deg).plot(ax=axes[4])
+    df[['theta']].apply(np.rad2deg).plot(ax=axes[4])
+
+    df[['wm']].apply(lambda radps: radps*60.0/2.0/np.pi).plot(ax=axes[5])
 
     return axes
 
