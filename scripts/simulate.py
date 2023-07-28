@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+plt.switch_backend('WebAgg')
 from matplotlib import cm
 from control import lqr, StateSpace, step_response, initial_response
 

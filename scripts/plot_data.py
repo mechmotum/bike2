@@ -14,9 +14,10 @@ Dependencies:
 import argparse
 
 import matplotlib.pyplot as plt
+plt.switch_backend('WebAgg')
+
 import numpy as np
 import pandas as pd
-
 
 def plot(csvfile):
     """Returns a matplotlib axes with data in ``csvfile`` plotted.
