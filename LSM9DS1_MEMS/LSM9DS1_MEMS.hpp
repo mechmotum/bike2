@@ -106,7 +106,7 @@ public:
     [[nodiscard]]
     auto get_theta() const -> scalar_type
     {
-      return std::atan2(scalar_type(y), scalar_type(z));
+      return std::atan2(scalar_type(z), scalar_type(y));
     }
   };
 
@@ -173,11 +173,11 @@ private:
       static constexpr std::uint8_t Z_disable = 0b0 << 5;
       static constexpr std::uint8_t Y_disable = 0b0 << 4;
       static constexpr std::uint8_t X_enable = 0b1 << 3;
-      static constexpr std::uint8_t LatchedInterrupt_disable = 0b0 << 1;
+      static constexpr std::uint8_t LatchedInterrupt_enable = 0b1 << 1;
 
       i2c_write(
           CTRL_REG4,
-          Z_disable | Y_disable | X_enable | LatchedInterrupt_disable);
+          Z_disable | Y_disable | X_enable | LatchedInterrupt_enable);
     }
 
     // NOLINTEND(readability-magic-numbers)
@@ -198,22 +198,22 @@ private:
 
     // CTRL_REG6_XL
     {
-      static constexpr std::uint8_t ODR_50Hz = 0b010 << 5;
-      static constexpr std::uint8_t FS_4g = 0b10 << 3;
-      static constexpr std::uint8_t BW_sel = 0b1 << 2;
-      static constexpr std::uint8_t BW_50Hz = 0b11;
-      i2c_write(CTRL_REG6_XL, ODR_50Hz | FS_4g | BW_sel | BW_50Hz);
+      static constexpr std::uint8_t ODR_952Hz = 0b110 << 5;
+      static constexpr std::uint8_t FS_2g = 0b00 << 3;
+      static constexpr std::uint8_t BW_odr = 0b0 << 2;
+      static constexpr std::uint8_t BW_408Hz = 0b00;
+      i2c_write(CTRL_REG6_XL, ODR_952Hz | FS_2g | BW_odr | BW_408Hz);
     }
 
     // CTRL_REG7_XL
     {
-      static constexpr std::uint8_t HR_enable = 0b1 << 7;
+      static constexpr std::uint8_t HR_disable = 0b0 << 7;
       static constexpr std::uint8_t LPF_ODR_div_50 = 0b00 << 5;
-      static constexpr std::uint8_t LPF_enable = 0b1 << 2;
+      static constexpr std::uint8_t LPF_disable = 0b0 << 2;
       static constexpr std::uint8_t HP_int_disable = 0b0;
       i2c_write(
           CTRL_REG7_XL,
-          HR_enable | LPF_ODR_div_50 | LPF_enable | HP_int_disable);
+          HR_disable | LPF_ODR_div_50 | LPF_disable | HP_int_disable);
     }
 
     // CTRL_REG8
