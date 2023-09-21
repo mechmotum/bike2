@@ -3,9 +3,11 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
+#include <cstdio>
 #include <experimental/linalg>
 #include <experimental/mdspan>
 #include <fmt/core.h>
+#include <fmt/ranges.h>
 
 namespace stx = std::experimental;
 
@@ -65,6 +67,9 @@ struct matrix
   {
     return span()[i, j];
   }
+
+  [[nodiscard]]
+  auto operator==(const matrix&) const -> bool= default;
 };
 
 auto main() -> int
@@ -85,6 +90,27 @@ auto main() -> int
     const auto s = fmt::format("The answer is {}.", C[0, 0]);
 
     expect("The answer is 19." == s);
+  };
+
+  test("add") = [] {
+    using Mat = matrix<int, 2, 2>;
+
+    auto A = Mat{{1, 2}, {3, 4}};
+
+    stx::linalg::add(A.span(), A.span(), A.span());
+
+    expect(Mat{{2, 4}, {6, 8}} == A);
+  };
+
+  test("add transposed") = [] {
+    using Mat = matrix<int, 2, 2>;
+
+    auto A = Mat{{1, 2}, {3, 4}};
+
+    stx::linalg::add(A.span(), stx::linalg::transposed(A.span()), A.span());
+
+    fmt::print(stderr, "{}\n", A.data);
+    expect(Mat{{2, 5}, {5, 8}} == A);
   };
   // NOLINTEND(readability-magic-numbers)
 }
